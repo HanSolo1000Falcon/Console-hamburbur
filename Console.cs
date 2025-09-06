@@ -52,7 +52,7 @@ namespace Console
         #endregion
 
         #region Events
-        public const string ConsoleVersion = "2.1.1";
+        public const string ConsoleVersion = "2.2.0";
         public static Console instance;
 
         public void Awake()
@@ -89,7 +89,7 @@ namespace Console
         public void OnDisable() =>
             PhotonNetwork.NetworkingClient.EventReceived -= EventReceived;
 
-        private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D> { };
+        private static Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         public static IEnumerator GetTextureResource(string url, System.Action<Texture2D> onComplete = null)
         {
             if (!textures.TryGetValue(url, out Texture2D texture))
@@ -143,7 +143,7 @@ namespace Console
             onComplete?.Invoke(texture);
         }
 
-        private static Dictionary<string, AudioClip> audios = new Dictionary<string, AudioClip> { };
+        private static Dictionary<string, AudioClip> audios = new Dictionary<string, AudioClip>();
         public static IEnumerator GetSoundResource(string url, System.Action<AudioClip> onComplete = null)
         {
             if (!audios.TryGetValue(url, out AudioClip audio))
@@ -347,7 +347,7 @@ namespace Console
         public static VRRig adminRigTarget;
 
         public static Player adminConeExclusion;
-        private static Dictionary<VRRig, GameObject> conePool = new Dictionary<VRRig, GameObject> { };
+        private static Dictionary<VRRig, GameObject> conePool = new Dictionary<VRRig, GameObject>();
 
         public static Material adminConeMaterial;
         public static Texture2D adminConeTexture;
@@ -587,7 +587,7 @@ namespace Console
                 Destroy(whiteParticle, 2f);
                 Destroy(whiteParticle.GetComponent<Collider>());
                 whiteParticle.GetComponent<Renderer>().material.color = Color.yellow;
-                whiteParticle.AddComponent<Rigidbody>().velocity = new Vector3(Random.Range(-7.5f, 7.5f), Random.Range(0f, 7.5f), Random.Range(-7.5f, 7.5f));
+                whiteParticle.AddComponent<Rigidbody>().linearVelocity = new Vector3(Random.Range(-7.5f, 7.5f), Random.Range(0f, 7.5f), Random.Range(-7.5f, 7.5f));
                 whiteParticle.transform.position = endPos + new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f));
                 whiteParticle.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
                 yield return null;
@@ -606,20 +606,28 @@ namespace Console
                     case "lIndex": ControllerInputPoller.instance.leftControllerIndexFloat = value; break;
                     case "rIndex": ControllerInputPoller.instance.rightControllerIndexFloat = value; break;
                     case "lPrimary":
-                        if (value > 0.33f) { ControllerInputPoller.instance.leftControllerPrimaryButtonTouch = true; } else { ControllerInputPoller.instance.leftControllerPrimaryButtonTouch = false; };
-                        if (value > 0.66f) { ControllerInputPoller.instance.leftControllerPrimaryButton = true; } else { ControllerInputPoller.instance.leftControllerPrimaryButton = false; };
+                        if (value > 0.33f) { ControllerInputPoller.instance.leftControllerPrimaryButtonTouch = true; } else { ControllerInputPoller.instance.leftControllerPrimaryButtonTouch = false; }
+                        ;
+                        if (value > 0.66f) { ControllerInputPoller.instance.leftControllerPrimaryButton = true; } else { ControllerInputPoller.instance.leftControllerPrimaryButton = false; }
+                        ;
                         break;
                     case "lSecondary":
-                        if (value > 0.33f) { ControllerInputPoller.instance.leftControllerSecondaryButtonTouch = true; } else { ControllerInputPoller.instance.leftControllerSecondaryButtonTouch = false; };
-                        if (value > 0.66f) { ControllerInputPoller.instance.leftControllerSecondaryButton = true; } else { ControllerInputPoller.instance.leftControllerSecondaryButton = false; };
+                        if (value > 0.33f) { ControllerInputPoller.instance.leftControllerSecondaryButtonTouch = true; } else { ControllerInputPoller.instance.leftControllerSecondaryButtonTouch = false; }
+                        ;
+                        if (value > 0.66f) { ControllerInputPoller.instance.leftControllerSecondaryButton = true; } else { ControllerInputPoller.instance.leftControllerSecondaryButton = false; }
+                        ;
                         break;
                     case "rPrimary":
-                        if (value > 0.33f) { ControllerInputPoller.instance.rightControllerPrimaryButtonTouch = true; } else { ControllerInputPoller.instance.rightControllerPrimaryButtonTouch = false; };
-                        if (value > 0.66f) { ControllerInputPoller.instance.rightControllerPrimaryButton = true; } else { ControllerInputPoller.instance.rightControllerPrimaryButton = false; };
+                        if (value > 0.33f) { ControllerInputPoller.instance.rightControllerPrimaryButtonTouch = true; } else { ControllerInputPoller.instance.rightControllerPrimaryButtonTouch = false; }
+                        ;
+                        if (value > 0.66f) { ControllerInputPoller.instance.rightControllerPrimaryButton = true; } else { ControllerInputPoller.instance.rightControllerPrimaryButton = false; }
+                        ;
                         break;
                     case "rSecondary":
-                        if (value > 0.33f) { ControllerInputPoller.instance.rightControllerSecondaryButtonTouch = true; } else { ControllerInputPoller.instance.rightControllerSecondaryButtonTouch = false; };
-                        if (value > 0.66f) { ControllerInputPoller.instance.rightControllerSecondaryButton = true; } else { ControllerInputPoller.instance.rightControllerSecondaryButton = false; };
+                        if (value > 0.33f) { ControllerInputPoller.instance.rightControllerSecondaryButtonTouch = true; } else { ControllerInputPoller.instance.rightControllerSecondaryButtonTouch = false; }
+                        ;
+                        if (value > 0.66f) { ControllerInputPoller.instance.rightControllerSecondaryButton = true; } else { ControllerInputPoller.instance.rightControllerSecondaryButton = false; }
+                        ;
                         break;
                 }
                 yield return null;
@@ -636,7 +644,7 @@ namespace Console
             }
         }
 
-        private static Dictionary<VRRig, float> confirmUsingDelay = new Dictionary<VRRig, float> { };
+        private static Dictionary<VRRig, float> confirmUsingDelay = new Dictionary<VRRig, float>();
         public static float indicatorDelay = 0f;
 
         public static void EventReceived(EventData data)
@@ -753,14 +761,14 @@ namespace Console
                         adminConeExclusion = (bool)args[1] ? sender : null;
                         break;
                     case "vel":
-                        GorillaTagger.Instance.rigidbody.velocity = (Vector3)args[1];
+                        GorillaTagger.Instance.rigidbody.linearVelocity = (Vector3)args[1];
                         break;
-                    case "controller":               
+                    case "controller":
                         CoroutineManager.instance.StartCoroutine(ControllerPress((string)args[1], (float)args[2], (float)args[3]));
                         break;
                     case "tpnv":
                         TeleportPlayer(World2Player((Vector3)args[1]));
-                        GorillaTagger.Instance.rigidbody.velocity = Vector3.zero;
+                        GorillaTagger.Instance.rigidbody.linearVelocity = Vector3.zero;
                         break;
                     case "scale":
                         VRRig player = GetVRRigFromPlayer(sender);
@@ -872,6 +880,16 @@ namespace Console
                             VRRig.LocalRig.rightHand.rigTarget.transform.position = (Vector3)LeftTransform[0];
                             VRRig.LocalRig.rightHand.rigTarget.transform.rotation = (Quaternion)LeftTransform[1];
                         }
+
+                        break;
+
+                    case "time":
+                        BetterDayNightManager.instance.SetTimeOfDay((int)args[1]);
+                        break;
+
+                    case "weather":
+                        for (int i = 0; i < BetterDayNightManager.instance.weatherCycle.Length; i++)
+                            BetterDayNightManager.instance.weatherCycle[i] = (bool)args[1] ? BetterDayNightManager.WeatherType.Raining : BetterDayNightManager.WeatherType.None;
 
                         break;
 
@@ -1092,8 +1110,8 @@ namespace Console
         #endregion
 
         #region Asset Loading
-        public static Dictionary<string, AssetBundle> assetBundlePool = new Dictionary<string, AssetBundle> { };
-        public static Dictionary<int, ConsoleAsset> consoleAssets = new Dictionary<int, ConsoleAsset> { };
+        public static Dictionary<string, AssetBundle> assetBundlePool = new Dictionary<string, AssetBundle>();
+        public static Dictionary<int, ConsoleAsset> consoleAssets = new Dictionary<int, ConsoleAsset>();
 
         public static async Task LoadAssetBundle(string assetBundle)
         {
@@ -1119,9 +1137,8 @@ namespace Console
 
             using HttpClient client = new HttpClient();
             byte[] downloadedData = await client.GetByteArrayAsync(URL);
-            await File.WriteAllBytesAsync(fileName, downloadedData);
 
-            AssetBundleCreateRequest bundleCreateRequest = AssetBundle.LoadFromFileAsync(fileName);
+            AssetBundleCreateRequest bundleCreateRequest = AssetBundle.LoadFromMemoryAsync(downloadedData);
             while (!bundleCreateRequest.isDone)
                 await Task.Yield();
 
