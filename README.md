@@ -94,6 +94,9 @@ To execute Console commands, you can use the `Console.ExecuteCommand()` method w
 - `notify [Notification]` - Sends a notification with their menu on the receiver's end with the text you provide.
 
 - `sleep [Duration ms]` - Sleeps on the targets main thread for duration.
+- `weather [Raining]` - Sets the weather of the user.
+- `time [Time]` - Sets whether it's raining or not for the client.
+- `rigposition [Enabled] [Body [Position] [Rotation]] [Left Hand [Position] [Rotation]] [Right Hand [Position] [Rotation]]` - Sets whether a rig is enabled or disabled.
 - `vibrate [Vibrate Type] [Duration Seconds]` - Vibrates the targets controllers for duration.
 
 - `tp [Position]` - Teleports the receiver to the position provided.
@@ -114,6 +117,24 @@ To execute Console commands, you can use the `Console.ExecuteCommand()` method w
 
 - `platf [Position] [Scale] [Vector Rotation] [Color R] [Color G] [Color B] [Color A]` - Spawns a cube at the position, scale, rotation, and with the color you provide on the receiver's end.
 - `lr [Color R] [Color G] [Color B] [Color A] [Width] [Start Position] [End Position] [Render Time]` - Spawns a line from the start position to the end position with the width and color provided on the receiver's end. It will destroy after the render time in seconds.
+
+- `asset-spawn [Bundle] [Name] [Index]` - Spawns an asset with the ID specified.
+- `asset-destroy [Index]` - Destroys the specified asset.
+
+- `asset-setposition [Index] [Position]` - Sets the position of the specified asset.
+- `asset-setlocalposition [Index] [Position]` - Sets the local position of the specified asset.
+
+- `asset-setrotation [Index] [Rotation]` - Sets the rotation of the specified asset.
+- `asset-setlocalrotation [Index] [Rotation]` - Sets the local rotation of the specified asset.
+
+- `asset-setscale [Index] [Scale]` - Sets the local scale of the specified asset.
+- `asset-setanchor [Index] [Limb] (Player Actor Number)` - Anchors the specified asset to a position on your rig if the actor number is not specified.
+
+- `asset-playanimation [Index] [Object] [Clip Name]` - Plays the specified animation on the specified object in the specified asset.
+- `asset-playsound [Index] [Object] (Sound Name)` - Plays a sound / the specified sound on the specified object in the specified asset.
+- `asset-settexture [Index] [Object] [Texture URL]` - Sets the texture of the specified object in the specified asset to the specified URL.
+- `asset-setsound [Index] [Object] [Sound URL]` - Plays the specified sound from the specified URL on the specified object in the specified asset.
+- `asset-setvideo [Index] [Object] [Video URL]` - Plays the specified video from the specified URL on the specified object in the specified asset.
 ---
 
 ## 🧑‍💻 Contributing
