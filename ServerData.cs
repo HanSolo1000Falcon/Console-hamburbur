@@ -33,8 +33,6 @@ namespace Console
         private static float ReloadTime = -1f;
 
         private static int LoadAttempts;
-
-        private static bool VersionWarning;
         private static bool GivenAdminMods;
 
         public void Awake()
