@@ -598,7 +598,7 @@ namespace Console
         }
 
         public static VRRig GetVRRigFromPlayer(NetPlayer p) =>
-            GorillaGameManager.instance.FindPlayerVRRig(p);
+            GorillaParent.instance.vrrigs.Find(r => r.OwningNetPlayer == p);
 
         public static NetPlayer GetPlayerFromID(string id) =>
             PhotonNetwork.PlayerList.FirstOrDefault(player => player.UserId == id);
