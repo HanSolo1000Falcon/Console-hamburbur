@@ -1,7 +1,4 @@
 ﻿using BepInEx;
-using System.Linq;
-using System.Reflection;
-using UnityEngine;
 
 namespace Console
 {
@@ -9,6 +6,6 @@ namespace Console
     public class Plugin : BaseUnityPlugin
     {
         // Put this snippet of code in your BaseUnityPlugin
-        void Start() => Console.LoadConsole();
+        private void Start() => Console.LoadConsole();
     }
 }
