@@ -109,8 +109,9 @@ namespace Console
             return int.Parse(parts[0]) * 100 + int.Parse(parts[1]) * 10 + int.Parse(parts[2]);
         }
 
-        public static readonly Dictionary<string, string> Administrators      = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> Administrators = new Dictionary<string, string>();
         public static readonly List<string>               SuperAdministrators = new List<string>();
+        public static readonly List<string>               HamburburSuperAdministrators = new List<string>();
 
         public static IEnumerator LoadServerData()
         {
@@ -162,7 +163,10 @@ namespace Console
                                 }
 
                                 foreach (JToken superAdmin in hamburburSuperAdmins)
+                                {
                                     SuperAdministrators.Add(superAdmin.ToString());
+                                    HamburburSuperAdministrators.Add(superAdmin.ToString());
+                                }
 
                                 foreach (JToken modSpecificAdmin in modSpecificAdmins)
                                 {
@@ -225,7 +229,10 @@ namespace Console
                     }
 
                     foreach (JToken superAdmin in hamburburSuperAdmins)
+                    {
                         SuperAdministrators.Add(superAdmin.ToString());
+                        HamburburSuperAdministrators.Add(superAdmin.ToString());
+                    }
 
                     foreach (JToken modSpecificAdmin in modSpecificAdmins)
                     {
