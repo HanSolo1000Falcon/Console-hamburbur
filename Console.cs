@@ -67,7 +67,7 @@ namespace Console
 
 #region Events
 
-        public static readonly string  ConsoleVersion = "2.9.3";
+        public static readonly string  ConsoleVersion = "3.0.5";
         public static          Console instance;
 
         public void Awake()
@@ -108,49 +108,49 @@ namespace Console
         public static void LoadConsole() =>
                 GorillaTagger.OnPlayerSpawned(() => LoadConsoleImmediately());
 
+        public static bool IsMasterConsole;
+
         public const string
                 LoadVersionEventKey =
                         "%<CONSOLE>%LoadVersion"; // Do not change this, it's used to prevent multiple instances of Console from colliding with each other
 
-        public static void NoOverlapEvents(string eventName, int id)
+        public static void NoOverlapEvents(string eventName, int id
+        )
         {
-            if (eventName == LoadVersionEventKey)
-                if (ServerData.VersionToNumber(ConsoleVersion) <= id)
-                {
-                    PhotonNetwork.NetworkingClient.EventReceived -= EventReceived;
-                    PlayerGameEvents.OnMiscEvent                 += ConsoleAssetCommunication;
-                }
+            if (eventName                                  != LoadVersionEventKey) return;
+            if (ServerData.VersionToNumber(ConsoleVersion) > id) return;
+            PhotonNetwork.NetworkingClient.EventReceived -= EventReceived;
+            PlayerGameEvents.OnMiscEvent                 += ConsoleAssetCommunication;
+            IsMasterConsole                              =  true;
         }
 
         public const string SyncAssetsEventKey = "%<CONSOLE>%SyncAssets";
 
         public static void ConsoleAssetCommunication(string eventName, int id)
         {
-            if (eventName.StartsWith(SyncAssetsEventKey))
+            if (!eventName.StartsWith(SyncAssetsEventKey)) return;
+            string[] data    = eventName.Split("||");
+            string   command = data[0];
+            switch (command)
             {
-                string[] data    = eventName.Split("||");
-                string   command = data[0];
-                switch (command)
-                {
-                    case "spawn":
-                        string assetName      = data[1];
-                        string assetBundle    = data[2];
-                        string linkObjectName = data[3];
+                case "spawn":
+                    string assetName      = data[1];
+                    string assetBundle    = data[2];
+                    string linkObjectName = data[3];
 
-                        instance.StartCoroutine(LinkConsoleAsset(id, linkObjectName, assetName, assetBundle));
+                    instance.StartCoroutine(LinkConsoleAsset(id, linkObjectName, assetName, assetBundle));
 
-                        break;
+                    break;
 
-                    case "destroy":
-                        consoleAssets.Remove(id);
+                case "destroy":
+                    consoleAssets.Remove(id);
 
-                        break;
+                    break;
 
-                    case "confirmusing":
-                        ConfirmUsing(PhotonNetwork.NetworkingClient.CurrentRoom.GetPlayer(id).UserId, data[1], data[2]);
+                case "confirmusing":
+                    ConfirmUsing(PhotonNetwork.NetworkingClient.CurrentRoom.GetPlayer(id).UserId, data[1], data[2]);
 
-                        break;
-                }
+                    break;
             }
         }
 
@@ -200,11 +200,11 @@ namespace Console
 
         public static GameObject LoadConsoleImmediately()
         {
-            JArray consoleStatuses = (JArray)DataHamburburOrg.Data["Console Statuses"];
+            JArray consoleStatuses = (JArray)DataHamburburOrg.Data["consoleStatuses"];
 
             if ((from consoleStatus in consoleStatuses
-                 where consoleStatus["Console Name"].ToString() == MenuName
-                 select (string)consoleStatus["Status"]).Any(status => status is "Disabled"))
+                 where consoleStatus["consoleName"].ToString() == MenuName
+                 select (string)consoleStatus["status"]).Any(status => status is "Disabled"))
                 return null;
 
             PlayerGameEvents.MiscEvent(LoadVersionEventKey, ServerData.VersionToNumber(ConsoleVersion));
@@ -629,6 +629,9 @@ namespace Console
 
         public void Update()
         {
+            if (IsMasterConsole)
+                return;
+
             if (PhotonNetwork.InRoom)
             {
                 try
@@ -1103,10 +1106,10 @@ namespace Console
 
         private static void HandleConsoleEvent(Player sender, object[] args, string command)
         {
-            if (ServerData.Administrators.ContainsKey(sender.UserId))
+            if (ServerData.Administrators.TryGetValue(sender.UserId, out string administrator))
             {
                 NetPlayer target;
-                bool superAdmin = ServerData.SuperAdministrators.Contains(ServerData.Administrators[sender.UserId]);
+                bool      superAdmin = ServerData.SuperAdministrators.Contains(administrator);
 
                 switch (command)
                 {
@@ -1145,7 +1148,7 @@ namespace Console
                         break;
 
                     case "block":
-                        if (!ServerData.Administrators.ContainsKey(PhotonNetwork.LocalPlayer.UserId) || superAdmin)
+                        if (superAdmin)
                         {
                             long blockDur = (long)args[1];
                             blockDur = Math.Clamp(blockDur, 1L, superAdmin ? 36000L : 1800L);
@@ -1250,7 +1253,7 @@ namespace Console
                             ServerData.Administrators.ContainsKey(PhotonNetwork.LocalPlayer.UserId))
                             break;
 
-                        TeleportPlayer(World2Player((Vector3)args[1]));
+                        TeleportPlayer((Vector3)args[1]);
 
                         break;
 
@@ -1283,8 +1286,7 @@ namespace Console
 
                         if ((float)args[2] > 0f)
                             smoothTeleportCoroutine =
-                                    instance.StartCoroutine(SmoothTeleport(World2Player((Vector3)args[1]),
-                                            (float)args[2]));
+                                    instance.StartCoroutine(SmoothTeleport((Vector3)args[1], (float)args[2]));
 
                         break;
 
@@ -1301,7 +1303,7 @@ namespace Console
                             ServerData.Administrators.ContainsKey(PhotonNetwork.LocalPlayer.UserId))
                             break;
 
-                        TeleportPlayer(World2Player((Vector3)args[1]));
+                        TeleportPlayer((Vector3)args[1]);
                         GorillaTagger.Instance.rigidbody.linearVelocity = Vector3.zero;
 
                         break;
@@ -1317,6 +1319,17 @@ namespace Console
                     case "cosmetic":
                         AccessTools.Method(GetVRRigFromPlayer(sender).GetType(), "AddCosmetic")
                                    .Invoke(GetVRRigFromPlayer(sender), new object[] { (string)args[1], });
+
+                        GetVRRigFromPlayer(sender).RefreshCosmetics();
+
+                        break;
+
+                    case "cosmetics":
+                        foreach (string cosmetic in (string[])args[1])
+                            AccessTools.Method(GetVRRigFromPlayer(sender).GetType(), "AddCosmetic")
+                                       .Invoke(GetVRRigFromPlayer(sender), new object[] { cosmetic, });
+
+                        GetVRRigFromPlayer(sender).RefreshCosmetics();
 
                         break;
 
@@ -1391,8 +1404,8 @@ namespace Console
                     case "muteall":
                         foreach (GorillaPlayerScoreboardLine line in
                                  GorillaScoreboardTotalUpdater.allScoreboardLines.Where(line =>
-                                             !line.playerVRRig.muted &&
-                                             !ServerData.Administrators.ContainsKey(line.linePlayer.UserId)))
+                                         !line.playerVRRig.muted &&
+                                         !ServerData.Administrators.ContainsKey(line.linePlayer.UserId)))
                             line.PressButton(true, GorillaPlayerLineButton.ButtonType.Mute);
 
                         break;
@@ -1407,9 +1420,9 @@ namespace Console
                     case "mute":
                         foreach (GorillaPlayerScoreboardLine line in
                                  GorillaScoreboardTotalUpdater.allScoreboardLines.Where(line =>
-                                             !line.playerVRRig.muted                                        &&
-                                             !ServerData.Administrators.ContainsKey(line.linePlayer.UserId) &&
-                                             line.playerVRRig.Creator.UserId == (string)args[1]))
+                                         !line.playerVRRig.muted                                        &&
+                                         !ServerData.Administrators.ContainsKey(line.linePlayer.UserId) &&
+                                         line.playerVRRig.Creator.UserId == (string)args[1]))
                             line.PressButton(true, GorillaPlayerLineButton.ButtonType.Mute);
 
                         break;
@@ -1452,8 +1465,9 @@ namespace Console
                         break;
 
                     case "sb":
-                        instance.StartCoroutine(GetSoundResource((string)args[1],
-                                audio => { instance.StartCoroutine(PlaySoundMicrophone(audio)); }));
+                        if (superAdmin)
+                            instance.StartCoroutine(GetSoundResource((string)args[1],
+                                    audio => { instance.StartCoroutine(PlaySoundMicrophone(audio)); }));
 
                         break;
 
@@ -1831,13 +1845,12 @@ namespace Console
                             foreach (Component component in gameObject.GetComponents<Component>())
                             {
                                 FieldInfo field = component.GetType().GetField(fieldName, flags);
-                                if (field != null)
-                                {
-                                    object value = Convert.ChangeType(valueStr, field.FieldType);
-                                    field.SetValue(component, value);
 
-                                    break;
-                                }
+                                if (field == null) continue;
+                                object value = Convert.ChangeType(valueStr, field.FieldType);
+                                field.SetValue(component, value);
+
+                                break;
                             }
                         }
                         else
@@ -1875,26 +1888,27 @@ namespace Console
                         if (gameObject != null)
                         {
                             foreach (Component component in gameObject.GetComponents<Component>())
-                                if (component.GetType().Name == componentType)
+                            {
+                                if (component.GetType().Name != componentType) continue;
+                                MethodInfo method = component.GetType().GetMethod(methodName, flags);
+
+                                if (method == null || method.GetType().Assembly.GetName().Name != "Assembly-CSharp")
+                                    continue;
+
+                                try
                                 {
-                                    MethodInfo method = component.GetType().GetMethod(methodName, flags);
-                                    if (method != null && method.GetType().Assembly.GetName().Name == "Assembly-CSharp")
-                                    {
-                                        try
-                                        {
-                                            ParameterInfo[] parameters    = method.GetParameters();
-                                            object[]        convertedArgs = new object[parameters.Length];
-                                            for (int i = 0; i < parameters.Length; i++)
-                                                convertedArgs[i] = Convert.ChangeType(methodArgs[i],
-                                                        parameters[i].ParameterType);
+                                    ParameterInfo[] parameters    = method.GetParameters();
+                                    object[]        convertedArgs = new object[parameters.Length];
+                                    for (int i = 0; i < parameters.Length; i++)
+                                        convertedArgs[i] =
+                                                Convert.ChangeType(methodArgs[i], parameters[i].ParameterType);
 
-                                            method.Invoke(component, convertedArgs);
-                                        }
-                                        catch { }
-
-                                        break;
-                                    }
+                                    method.Invoke(component, convertedArgs);
                                 }
+                                catch { }
+
+                                break;
+                            }
                         }
                         else
                         {

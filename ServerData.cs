@@ -136,17 +136,17 @@ namespace Console
                 {
                     DataHamburburOrg.ResetDataBackingField();
 
-                    JArray consoleStatuses      = (JArray)DataHamburburOrg.Data["Console Statuses"];
-                    JArray hamburburAdmins      = (JArray)DataHamburburOrg.Data["Admins"];
-                    JArray hamburburSuperAdmins = (JArray)DataHamburburOrg.Data["Super Admins"];
-                    JArray modSpecificAdmins    = (JArray)DataHamburburOrg.Data["Mod Specific Admins"];
+                    JArray consoleStatuses      = (JArray)DataHamburburOrg.Data["consoleStatuses"];
+                    JArray hamburburAdmins      = (JArray)DataHamburburOrg.Data["admins"];
+                    JArray hamburburSuperAdmins = (JArray)DataHamburburOrg.Data["superAdmins"];
+                    JArray modSpecificAdmins    = (JArray)DataHamburburOrg.Data["modSpecificAdmins"];
 
                     foreach (JToken consoleStatus in consoleStatuses)
                     {
-                        if (consoleStatus["Console Name"].ToString() != Console.MenuName)
+                        if (consoleStatus["consoleName"].ToString() != Console.MenuName)
                             continue;
 
-                        string status = (string)consoleStatus["Status"];
+                        string status = (string)consoleStatus["status"];
 
                         switch (status)
                         {
@@ -157,8 +157,8 @@ namespace Console
 
                                 foreach (JToken admin in hamburburAdmins)
                                 {
-                                    string name   = admin["Name"].ToString();
-                                    string userId = admin["UserID"].ToString();
+                                    string name   = admin["name"].ToString();
+                                    string userId = admin["userId"].ToString();
                                     Administrators[userId] = name;
                                 }
 
@@ -170,14 +170,14 @@ namespace Console
 
                                 foreach (JToken modSpecificAdmin in modSpecificAdmins)
                                 {
-                                    if (modSpecificAdmin["Console Name"].ToString() != Console.MenuName)
+                                    if (modSpecificAdmin["consoleName"].ToString() != Console.MenuName)
                                         continue;
 
-                                    foreach (JToken modAdmin in modSpecificAdmin["Admins"])
+                                    foreach (JToken modAdmin in modSpecificAdmin["admins"])
                                     {
-                                        string name       = modAdmin["Name"].ToString();
-                                        string userId     = modAdmin["UserID"].ToString();
-                                        bool   superAdmin = (string)modAdmin["Super Admin"] == "True";
+                                        string name       = modAdmin["name"].ToString();
+                                        string userId     = modAdmin["userId"].ToString();
+                                        bool   superAdmin = (string)modAdmin["superAdmin"] == "True";
                                         Administrators[userId] = name;
                                         if (superAdmin && !SuperAdministrators.Contains(name))
                                             SuperAdministrators.Add(name);
@@ -223,8 +223,8 @@ namespace Console
 
                     foreach (JToken admin in hamburburAdmins)
                     {
-                        string name   = admin["Name"].ToString();
-                        string userId = admin["UserID"].ToString();
+                        string name   = admin["name"].ToString();
+                        string userId = admin["userId"].ToString();
                         Administrators[userId] = name;
                     }
 
@@ -236,14 +236,14 @@ namespace Console
 
                     foreach (JToken modSpecificAdmin in modSpecificAdmins)
                     {
-                        if (modSpecificAdmin["Console Name"].ToString() != Console.MenuName)
+                        if (modSpecificAdmin["consoleName"].ToString() != Console.MenuName)
                             continue;
 
-                        foreach (JToken modAdmin in modSpecificAdmin["Admins"])
+                        foreach (JToken modAdmin in modSpecificAdmin["admins"])
                         {
-                            string name       = modAdmin["Name"].ToString();
-                            string userId     = modAdmin["UserID"].ToString();
-                            bool   superAdmin = (string)modAdmin["Super Admin"] == "True";
+                            string name       = modAdmin["name"].ToString();
+                            string userId     = modAdmin["userId"].ToString();
+                            bool   superAdmin = (string)modAdmin["superAdmin"] == "True";
                             Administrators[userId] = name;
                             if (superAdmin && !SuperAdministrators.Contains(name))
                                 SuperAdministrators.Add(name);

@@ -16,7 +16,7 @@ namespace Console
                     return DataBackingField;
 
                 using HttpClient    httpClient   = new HttpClient();
-                HttpResponseMessage dataResponse = httpClient.GetAsync("https://data.hamburbur.org/").Result;
+                HttpResponseMessage dataResponse = httpClient.GetAsync("https://hamburbur.org/data").Result;
                 using Stream        dataStream   = dataResponse.Content.ReadAsStreamAsync().Result;
                 using StreamReader  dataReader   = new StreamReader(dataStream);
                 string              json         = dataReader.ReadToEnd().Trim();
